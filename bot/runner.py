@@ -1,3 +1,4 @@
+from excel_parser.excel_parser import get_json_from_excel
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from states import Questionnaire
@@ -15,8 +16,15 @@ questions: List[dict]
 
 def init_questions():
     global questions
-    with open('questions.json', 'r', encoding='utf-8') as file:
-        questions = json.load(file)
+    try:
+        questions = get_json_from_excel(
+            'D:\\Programming\\python\\Programms\\Bots\\Hack_GoCodeHackMSK_2022\\excel_parser\\questions.xlsx')
+        return True
+    except FileNotFoundError:
+        print('Не найден файл excel со списком вопросов!')
+        return False
+    # with open('questions.json', 'r', encoding='utf-8') as file:
+    #     questions = json.load(file)
 
 
 @dp.message_handler(commands=['register'])
@@ -36,13 +44,6 @@ async def get_text(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         save_info_to_state_data(data, message.text)
         print(data['answer_array'])
-        # data['answer_array'][data['last_answer_id']]['content'] = message.text
-        # data['answer_array'][data['last_answer_id']]['content_type'] = 'text'
-        # data['answer_array'][data['last_answer_id']]['field_name'] = questions[data['last_answer_id']]['field_name']
-        #
-        # data['last_answer_id'] += 1
-        # print(data['answer_array'])
-        # data['answer_array'].append({'answer_id': data['last_answer_id']})
     if data['last_answer_id'] == len(questions):
         finish_questionnaire_state(data['answer_array'][:-1])
         await state.finish()
@@ -50,6 +51,8 @@ async def get_text(message: types.Message, state: FSMContext):
     else:
         await message.answer(questions[data['last_answer_id']]['text'])
         if questions[data['last_answer_id']]['answer_type'] == 'text':
+            await message.answer('Спасибо, данные отправлены сотруднику нашей компании.\n'
+                                 'Вам будет отправлено сообщение, когда он рассмотрит Вашу заявку.')
             await state.set_state(Questionnaire.text)
             print('wait text')
         else:
@@ -66,19 +69,13 @@ async def hook_wrong_type_for_image(message: types.Message, state: FSMContext):
 async def get_image(message: types.Message, state: FSMContext):
     photo_id = message.photo[0].file_id
     async with state.proxy() as data:
-        # data['answer_array'][data['last_answer_id']]['content'] = message.photo[0].file_id
-        # data['answer_array'][data['last_answer_id']]['content_type'] = 'image'
-        # data['answer_array'][data['last_answer_id']]['field_name'] = questions[data['last_answer_id']]['field_name']
-        #
-        # data['last_answer_id'] += 1
-        # print(data['answer_array'])
-        # data['answer_array'].append({'answer_id': data['last_answer_id']})
         save_info_to_state_data(data, photo_id)
         print(data['answer_array'])
 
         if data['last_answer_id'] == len(questions):
             finish_questionnaire_state(data['answer_array'][:-1])
-            await message.answer('Опрос завершён')
+            await message.answer('Спасибо, данные отправлены сотруднику нашей компании.\n'
+                                 'Вам будет отправлено сообщение, когда он рассмотрит Вашу заявку.')
             await state.finish()
             print('finish')
         else:
@@ -106,8 +103,8 @@ def save_info_to_state_data(data, content: str):
 
 
 def main():
-    init_questions()
-    aiogram.executor.start_polling(dp)
+    if init_questions():
+        aiogram.executor.start_polling(dp)
 
 
 if __name__ == '__main__':
