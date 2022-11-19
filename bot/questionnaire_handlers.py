@@ -5,7 +5,8 @@ from bot_runner import dp
 from typing import List
 import json
 from Files import work_with_files
-
+from PowerPoint import pptx_saver
+from Word import word_saver
 
 questions: List[dict]
 
@@ -37,7 +38,7 @@ async def get_text(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         save_info_to_state_data(data, message.text)
     if data['last_answer_id'] == len(questions):
-        finish_questionnaire_state(data['answer_array'][:-1])
+        await finish_questionnaire_state(data['answer_array'][:-1])
         await message.answer('Спасибо, данные отправлены сотруднику нашей компании.\n'
                              'Вам будет отправлено сообщение, когда он рассмотрит Вашу заявку.')
         await state.finish()
@@ -61,10 +62,12 @@ def save_info_to_state_data(data, content: str):
     data['answer_array'].append({'answer_id': data['last_answer_id']})
 
 
-def finish_questionnaire_state(result_array: List[dict]):
+async def finish_questionnaire_state(result_array: List[dict]):
     # TODO сгенерировать файлы и сохранить в папку
 
-
+    file_name = work_with_files.get_full_path('Files\\NewFiles\\' + result_array[0]['content'])
+    await pptx_saver.save_pptx(result_array, file_name)
+    await word_saver.save_word(result_array, file_name)
 
     with open('result.json', 'w', encoding='utf-8') as file:
         json.dump(result_array, file, indent=4, ensure_ascii=False)
@@ -88,15 +91,15 @@ async def hook_wrong_type_for_image(message: types.Message, state: FSMContext):
 
 # @dp.message_handler(content_types=['photo'], state=Questionnaire.image)
 async def get_image(message: types.Message, state: FSMContext):
-    # photo_id = message.photo[0].file_id
+
     photo_path = work_with_files.get_full_path('Files\\tempimages\\' + message.photo[-1].file_id + '.jpg')
-    # photo_path = await
+
     await message.photo[-1].download(photo_path)
     async with state.proxy() as data:
         save_info_to_state_data(data, photo_path)
 
     if data['last_answer_id'] == len(questions):
-        finish_questionnaire_state(data['answer_array'][:-1])
+        await finish_questionnaire_state(data['answer_array'][:-1])
         await message.answer('Спасибо, данные отправлены сотруднику нашей компании.\n'
                              'Вам будет отправлено сообщение, когда он рассмотрит Вашу заявку.')
         await state.finish()
