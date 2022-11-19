@@ -28,26 +28,81 @@ async def start(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
     async with state.proxy() as data:
         data['last_answer_id'] = 0
-        data['answer_array'] = [{'answer_id': 1}]
+        data['answer_array'] = [{'answer_id': data['last_answer_id']}]
 
 
-@dp.message_handler(state=Questionnaire.text)
+@dp.message_handler(content_types=['text'], state=Questionnaire.text)
 async def get_text(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-
-        # TODO проверка на правильный тип того, что отправил пользователь
-
-        data['answer_array'][data['last_answer_id']]['content'] = message.text
-        data['answer_array'][data['last_answer_id']]['content_type'] = 'text'
-
-        data['last_answer_id'] += 1
-        data['answer_array'].append({'answer_id': data['last_answer_id']})
-    if questions[data['last_answer_id']]['answer_type'] == 'text':
-        await message.answer(questions[data['last_answer_id']]['text'])
-        await state.set_state(Questionnaire.text)
-    else:
-        print('!')
+        save_info_to_state_data(data, message.text)
+        print(data['answer_array'])
+        # data['answer_array'][data['last_answer_id']]['content'] = message.text
+        # data['answer_array'][data['last_answer_id']]['content_type'] = 'text'
+        # data['answer_array'][data['last_answer_id']]['field_name'] = questions[data['last_answer_id']]['field_name']
+        #
+        # data['last_answer_id'] += 1
+        # print(data['answer_array'])
+        # data['answer_array'].append({'answer_id': data['last_answer_id']})
+    if data['last_answer_id'] == len(questions):
+        finish_questionnaire_state(data['answer_array'][:-1])
         await state.finish()
+        print('finish')
+    else:
+        await message.answer(questions[data['last_answer_id']]['text'])
+        if questions[data['last_answer_id']]['answer_type'] == 'text':
+            await state.set_state(Questionnaire.text)
+            print('wait text')
+        else:
+            await state.set_state(Questionnaire.image)
+            print('wait img')
+
+
+@dp.message_handler(content_types=['text'], state=Questionnaire.image)
+async def hook_wrong_type_for_image(message: types.Message, state: FSMContext):
+    await message.answer('Необходима фотография')
+
+
+@dp.message_handler(content_types=['photo'], state=Questionnaire.image)
+async def get_image(message: types.Message, state: FSMContext):
+    photo_id = message.photo[0].file_id
+    async with state.proxy() as data:
+        # data['answer_array'][data['last_answer_id']]['content'] = message.photo[0].file_id
+        # data['answer_array'][data['last_answer_id']]['content_type'] = 'image'
+        # data['answer_array'][data['last_answer_id']]['field_name'] = questions[data['last_answer_id']]['field_name']
+        #
+        # data['last_answer_id'] += 1
+        # print(data['answer_array'])
+        # data['answer_array'].append({'answer_id': data['last_answer_id']})
+        save_info_to_state_data(data, photo_id)
+        print(data['answer_array'])
+
+        if data['last_answer_id'] == len(questions):
+            finish_questionnaire_state(data['answer_array'][:-1])
+            await message.answer('Опрос завершён')
+            await state.finish()
+            print('finish')
+        else:
+            await message.answer(questions[data['last_answer_id']]['text'])
+            if questions[data['last_answer_id']]['answer_type'] == 'text':
+                await state.set_state(Questionnaire.text)
+                print('wait text')
+            else:
+                await state.set_state(Questionnaire.image)
+                print('wait img')
+
+
+def finish_questionnaire_state(result_array: List[dict]):
+    with open('result.json', 'w', encoding='utf-8') as file:
+        json.dump(result_array, file, indent=4, ensure_ascii=False)
+
+
+def save_info_to_state_data(data, content: str):
+    data['answer_array'][data['last_answer_id']]['content'] = content
+    data['answer_array'][data['last_answer_id']]['content_type'] = questions[data['last_answer_id']]['answer_type']
+    data['answer_array'][data['last_answer_id']]['field_name'] = questions[data['last_answer_id']]['field_name']
+
+    data['last_answer_id'] += 1
+    data['answer_array'].append({'answer_id': data['last_answer_id']})
 
 
 def main():

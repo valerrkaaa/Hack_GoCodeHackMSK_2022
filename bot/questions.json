@@ -5,13 +5,13 @@
     "answer_type": "text"
   },
   {
-    "text": "Почему в вас стоит инвестировать?\nПродукт (фокусный продукт, на развитие которого привлекаются инвестиции) (1-2 предложения)",
+    "text": "22222",
     "field_name": "2__",
     "answer_type": "text"
   },
   {
     "text": "state3",
     "field_name": "3__",
-    "answer_type": "-"
+    "answer_type": "image"
   }
 ]
