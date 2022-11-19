@@ -7,72 +7,44 @@ from pathlib import Path
 class Memo:
 
     def __init__(self):
-        self.summary_tags = ['comp_name', 'work_with', 'comp_short_story', 'comp_product',
-                             'product_uniq', 'product_local', 'product_rivalry', 'product_market',
-                             'comp_cases', 'comp_ accel', 'comp_ invest', 'comp_pilot',
-                             'pilot_result']
-        self.product_tags = ['comp_product', 'traction_pilot', 'business_model', 'product_photo']
+        self.tags = ['1tag', '2tag', '3tag', '4tag', '5tag',
+                     '6tag', '7tag', '8tag', '9tag', '10tag',
+                     '11tag', '12tag', '13tag']
+
+        # self.temp_path = ['Summary_temp.docx', 'Market_temp.docx', 'Plans_temp.docx', 'Product_temp.docx',
+        #                   'Team_temp.docx', 'Terms_temp.docx', 'Traction_temp.docx', 'Contact_temp.docx']
 
     # шаблоны
     def get_paras(self, path):
         self.document = Document(path)
         self.paras = self.document.paragraphs
 
-    # создание саммари
-    def summary_build(self, summary):
-        self.get_paras(Path(pathlib.Path.cwd(), 'templates', 'Summary_temp.docx'))
+    # создание части меморандума
+    def part_build(self, text_answers, name_temp):
+        self.get_paras(Path(pathlib.Path.cwd(), 'templates', name_temp))
         for para in self.paras:
-            for i in range(len(self.summary_tags)):  # берем параграф, ищем в нем теги
-                if para.text.find(self.summary_tags[i]) != -1:
-                    para.text = para.text.replace(self.summary_tags[i], summary[i])  # меняем соответсвующий тег
+            for i in range(len(self.tags)):  # берем параграф, ищем в нем теги
+                if para.text.find(self.tags[i]) != -1:
+                    para.text = para.text.replace(self.tags[i], text_answers[i])  # меняем соответсвующий тег
+        self.document.save(name_temp.split('_')[0] + '.docx')
 
-        self.document.save('Summary.docx')
 
-    # создание описания продукта
-    def product_build(self, product):
-        self.get_paras(Path(pathlib.Path.cwd(), 'templates', 'Product_temp.docx'))
-        for para in self.paras:
-            for i in range(len(self.product_tags)):
-                if para.text.find(self.product_tags[i]) != -1:
-                    para.text = para.text.replace(self.product_tags[i], product[i])
-        self.document.save('Product.docx')
+# sum = ['Васян INC', 'авто', 'компания была основана в июле 2003 года Мартином Эберхардом и Марком '
+#                             'Тарпеннингом, но нынешнее руководство компании называет сооснователями Илона '
+#                             'Маска, Джеффри Брайана Страубела и Иэна Райта. В 2019 году Tesla стала '
+#                             'крупнейшим производителем электромобилей в мире.', 'Электро бритвы, нет авто',
+#        'уникальна ну', 'Американия', 'много кто', 'Армерика, Русь, и еще там',
+#        'что-то делаем', 'Хакатон взяли за 3 рубля', 'ГазпромНефть', 'Запустили в космос',
+#        'До сих пор летит']
+# pr = [sum[3], 'Для Глока жизнь без трэкшн-контроля стала нормой после того, как он провел несколько сезонов в Champ '
+#               'Car и GP2, научившись пилотировать мощные машины без зоны безопасности в виде электронных средств '
+#               'помощи',
+#       'Это ключевое место всей бизнес-модели. Нужно описать сегменты целевой аудитории, '
+#       'то есть людей, которые будут покупать ваши товары или услуги. Важно понять, '
+#       'кто ваши клиенты, какие качества продукта для них важны, сколько они готовы платить и за '
+#       'что.', 'фото']
+trm = ['1234', '165', '2890', '10', 'цель цель цель цель цель цель цель цель цель цель цель ']
 
-    # создание описания рынка
-    def market_build(self):
-        pass
+test = Memo()
 
-    # создание описания результатов
-    def results_build(self):
-        pass
-
-    # создание информации о команде
-    def team_build(self):
-        pass
-
-    # создание описания планов
-    def plans_build(self):
-        pass
-
-    # создание описания по условиям сделки
-    def terms_build(self):
-        pass
-
-def main():
-    sum = ['Васян INC', 'авто', 'компания была основана в июле 2003 года Мартином Эберхардом и Марком '
-                                'Тарпеннингом, но нынешнее руководство компании называет сооснователями Илона '
-                                'Маска, Джеффри Брайана Страубела и Иэна Райта. В 2019 году Tesla стала '
-                                'крупнейшим производителем электромобилей в мире.', 'Электро бритвы, нет авто',
-           'уникальна ну', 'Американия', 'много кто', 'Армерика, Русь, и еще там',
-           'что-то делаем', 'Хакатон взяли за 3 рубля', 'ГазпромНефть', 'Запустили в космос',
-           'До сих пор летит']
-    pr = [sum[3], 'Для Глока жизнь без трэкшн-контроля стала нормой после того, как он провел несколько сезонов в Champ '
-                  'Car и GP2, научившись пилотировать мощные машины без зоны безопасности в виде электронных средств '
-                  'помощи',
-          'Это ключевое место всей бизнес-модели. Нужно описать сегменты целевой аудитории, '
-          'то есть людей, которые будут покупать ваши товары или услуги. Важно понять, '
-          'кто ваши клиенты, какие качества продукта для них важны, сколько они готовы платить и за '
-          'что.', 'фото']
-
-    test = Memo()
-    # test.summary_build(sum)
-    test.product_build(pr)
+test.part_build(trm, 'Terms_temp.docx')
