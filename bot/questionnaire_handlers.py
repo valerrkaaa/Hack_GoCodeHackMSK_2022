@@ -4,6 +4,7 @@ from states import Questionnaire
 from bot_runner import dp
 from typing import List
 import json
+from Files import work_with_files
 
 
 questions: List[dict]
@@ -35,7 +36,6 @@ async def start(message: types.Message):
 async def get_text(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         save_info_to_state_data(data, message.text)
-        print(data['answer_array'])
     if data['last_answer_id'] == len(questions):
         finish_questionnaire_state(data['answer_array'][:-1])
         await message.answer('Спасибо, данные отправлены сотруднику нашей компании.\n'
@@ -63,6 +63,9 @@ def save_info_to_state_data(data, content: str):
 
 def finish_questionnaire_state(result_array: List[dict]):
     # TODO сгенерировать файлы и сохранить в папку
+
+
+
     with open('result.json', 'w', encoding='utf-8') as file:
         json.dump(result_array, file, indent=4, ensure_ascii=False)
 
@@ -85,22 +88,24 @@ async def hook_wrong_type_for_image(message: types.Message, state: FSMContext):
 
 # @dp.message_handler(content_types=['photo'], state=Questionnaire.image)
 async def get_image(message: types.Message, state: FSMContext):
-    photo_id = message.photo[0].file_id
+    # photo_id = message.photo[0].file_id
+    photo_path = work_with_files.get_full_path('Files\\tempimages\\' + message.photo[-1].file_id + '.jpg')
+    # photo_path = await
+    await message.photo[-1].download(photo_path)
     async with state.proxy() as data:
-        save_info_to_state_data(data, photo_id)
-        print(data['answer_array'])
+        save_info_to_state_data(data, photo_path)
 
-        if data['last_answer_id'] == len(questions):
-            finish_questionnaire_state(data['answer_array'][:-1])
-            await message.answer('Спасибо, данные отправлены сотруднику нашей компании.\n'
-                                 'Вам будет отправлено сообщение, когда он рассмотрит Вашу заявку.')
-            await state.finish()
-            print('finish')
+    if data['last_answer_id'] == len(questions):
+        finish_questionnaire_state(data['answer_array'][:-1])
+        await message.answer('Спасибо, данные отправлены сотруднику нашей компании.\n'
+                             'Вам будет отправлено сообщение, когда он рассмотрит Вашу заявку.')
+        await state.finish()
+        print('finish')
+    else:
+        await message.answer(questions[data['last_answer_id']]['text'])
+        if questions[data['last_answer_id']]['answer_type'] == 'text':
+            await state.set_state(Questionnaire.text)
+            print('wait text')
         else:
-            await message.answer(questions[data['last_answer_id']]['text'])
-            if questions[data['last_answer_id']]['answer_type'] == 'text':
-                await state.set_state(Questionnaire.text)
-                print('wait text')
-            else:
-                await state.set_state(Questionnaire.image)
-                print('wait img')
+            await state.set_state(Questionnaire.image)
+            print('wait img')
