@@ -15,7 +15,7 @@ def get_questions(path):
 
 
 def main():
-    questions = get_questions(get_full_path('excel_parser\\questions1.xlsx'))
+    questions = get_questions(get_full_path('excel_parser\\questions.xlsx'))
     if questions:
         questionnaire_handlers.register_questionnaire_handlers(dp, questions)
         admin_handler.register_admin_handlers(dp)

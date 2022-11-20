@@ -14,11 +14,12 @@ async def save_pptx(result_array, file_name):
                 if type(e) == Shape:
                     if e.text == result_element['field_name']:
                         if result_element['content_type'] == 'image':
-                            layout.shapes.add_picture(result_element['content'], e.left, e.top, e.width, e.height)
+                            if result_element['content'] != '-':
+                                layout.shapes.add_picture(result_element['content'], e.left, e.top, e.width, e.height)
 
-                            e.element.getparent().remove(e.element)
-                            # TODO os.remove(result_element['content'])
+                                e.element.getparent().remove(e.element)
+                                # TODO os.remove(result_element['content'])
                         elif result_element['content_type'] == 'text':
-                            if e.text.lower() == result_element['field_name']:
+                            if e.text.lower().strip().strip('\n') == result_element['field_name'].strip().strip('\n'):
                                 e.text = result_element['content']
     presentation.save(pptx_path_output)

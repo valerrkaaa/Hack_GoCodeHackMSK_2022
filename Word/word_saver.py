@@ -11,10 +11,12 @@ async def save_word(result_array, file_name):
 
     render_dict = {}
     for result_element in result_array:
+
         if result_element['content_type'] == 'text':
             render_dict[result_element['field_name'].replace('{{', '').replace('}}', '')] = result_element['content']
-        # elif result_element['content_type'] == 'image':
-            # render_dict[result_element['field_name']] = InlineImage(
-            #     tpl, image_descriptor=result_element['content'], width=Mm(150))
+        elif result_element['content_type'] == 'image':
+            if result_element['content'] != '-':
+                render_dict[result_element['field_name']] = InlineImage(
+                    tpl, image_descriptor=result_element['content'], width=Mm(150))
     tpl.render(render_dict)
     tpl.save(word_path_output)
