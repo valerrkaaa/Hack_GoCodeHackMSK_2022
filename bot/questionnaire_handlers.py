@@ -51,7 +51,7 @@ async def start(message: types.Message):
     # await message.answer('Сообщение в начале опроса')
     # await message.answer(questions[0]['text'])
     # await Questionnaire.text.set()
-    await message.answer('Введите номер формы опроса:')
+    await message.answer(f'Введите номер формы опроса (от 0 до {len(all_questions) - 1}):')
     await Questionnaire.start.set()
 
     # state = dp.current_state(user=message.from_user.id)
@@ -67,7 +67,7 @@ async def get_text(message: types.Message, state: FSMContext):
     if data['last_answer_id'] == len(questions):
         await finish_questionnaire_state(data['answer_array'][:-1])
         await message.answer('Спасибо, данные отправлены сотруднику нашей компании.\n'
-                             'Вам будет отправлено сообщение, когда он рассмотрит Вашу заявку.')
+                             'С Вами свяжутся, когда он рассмотрит Вашу заявку.')
         await state.finish()
         print('finish')
     else:

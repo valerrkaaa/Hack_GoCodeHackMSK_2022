@@ -20,6 +20,6 @@ async def save_pptx(result_array, file_name):
                                 e.element.getparent().remove(e.element)
                                 # TODO os.remove(result_element['content'])
                         elif result_element['content_type'] == 'text':
-                            if e.text.lower().strip().strip('\n') == result_element['field_name'].strip().strip('\n'):
-                                e.text = result_element['content']
+                            if e.text.lower().strip().strip('\n').find(result_element['field_name'].strip().strip('\n')) != -1:
+                                e.text = e.text.replace(result_element['field_name'], result_element['content'])
     presentation.save(pptx_path_output)

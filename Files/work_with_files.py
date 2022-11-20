@@ -23,10 +23,10 @@ def get_new_pair_of_files():
         for file1 in file_list1:
             for _, _, file_list2 in os.walk(folder_path):
                 for file2 in file_list2:
-                    if os.path.dirname(file1) == os.path.dirname(file2):
+                    if os.path.split(os.path.basename(file1))[:-1] == os.path.split(os.path.basename(file2))[:-1]:
                         for _, _, file_list3 in os.walk(folder_path):
-                            for file3 in file_list2:
-                                if os.path.dirname(file1) == os.path.dirname(file2) == os.path.dirname(file3):
+                            for file3 in file_list3:
+                                if os.path.split(os.path.basename(file2))[:-1] == os.path.split(os.path.basename(file3))[:-1]:
                                     if file1 != file2 and file1 != file3 and file2 != file3:
                                         return os.path.join(folder_path, file1), \
                                                os.path.join(folder_path, file2), os.path.join(folder_path, file3)

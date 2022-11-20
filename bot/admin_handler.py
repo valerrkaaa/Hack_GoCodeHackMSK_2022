@@ -44,8 +44,8 @@ async def set_admin_is_free(message: types.Message):
         await try_send_files_somebody()
 
 
-async def try_send_files_somebody():
-    free_admins = []
+async def try_send_files_somebody(admin_id=[]):
+    free_admins = admin_id
     for admin_id, is_free in admins_list.items():
         if is_free:
             free_admins.append(admin_id)
@@ -61,4 +61,3 @@ async def try_send_files_somebody():
 
             work_with_files.move_files_to_old_folder(file1, file2, file3)
             admins_list[admin] = 'busy'
-
