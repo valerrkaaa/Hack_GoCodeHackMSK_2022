@@ -24,14 +24,19 @@ def get_new_pair_of_files():
             for _, _, file_list2 in os.walk(folder_path):
                 for file2 in file_list2:
                     if os.path.dirname(file1) == os.path.dirname(file2):
-                        if file1 != file2:
-                            return os.path.join(folder_path, file1), os.path.join(folder_path, file2)
-    return None, None
+                        for _, _, file_list3 in os.walk(folder_path):
+                            for file3 in file_list2:
+                                if os.path.dirname(file1) == os.path.dirname(file2) == os.path.dirname(file3):
+                                    if file1 != file2 and file1 != file3 and file2 != file3:
+                                        return os.path.join(folder_path, file1), \
+                                               os.path.join(folder_path, file2), os.path.join(folder_path, file3)
+    return None, None, None
 
 
-def move_files_to_old_folder(file1, file2):
+def move_files_to_old_folder(file1, file2, file3):
     os.replace(file1, os.path.join(get_full_path('Files\\OldFiles'), os.path.basename(file1)))
     os.replace(file2, os.path.join(get_full_path('Files\\OldFiles'), os.path.basename(file2)))
+    os.replace(file3, os.path.join(get_full_path('Files\\OldFiles'), os.path.basename(file3)))
 
 
 def main():

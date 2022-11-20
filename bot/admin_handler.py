@@ -17,12 +17,12 @@ async def enable_admin_rights(message: types.Message):
     await message.answer('Вы стали администратором!')
     await try_send_files_somebody()
 
-    from PowerPoint import pptx_saver
-    import json
-
-    with open(r'D:\Programming\python\Programms\Bots\Hack_GoCodeHackMSK_2022\bot\result.json', 'r', encoding='utf-8') as file:
-        res = json.load(file)
-    await pptx_saver.save_pptx(res)
+    # from PowerPoint import pptx_saver
+    # import json
+    #
+    # with open(r'D:\Programming\python\Programms\Bots\Hack_GoCodeHackMSK_2022\bot\result.json', 'r', encoding='utf-8') as file:
+    #     res = json.load(file)
+    # await pptx_saver.save_pptx(res)
 
     # a = bot.download_file('AgACAgIAAxkBAAICOWN5F48gJDrDUJT-kdcC93yYQbmoAAJxwzEbvRLJS_pP3nmepAMiAQADAgADcwADKwQ')
     # # image = r'D:\other\обои\12.jpg'
@@ -51,13 +51,14 @@ async def try_send_files_somebody():
             free_admins.append(admin_id)
 
     for admin in free_admins:
-        file1, file2 = work_with_files.get_new_pair_of_files()
+        file1, file2, file3 = work_with_files.get_new_pair_of_files()
         if file1:
             media = types.MediaGroup()
             media.attach_document(open(file1, 'rb'))
             media.attach_document(open(file2, 'rb'))
+            media.attach_document(open(file3, 'rb'))
             await bot.send_media_group(admin, media=media)
 
-            work_with_files.move_files_to_old_folder(file1, file2)
+            work_with_files.move_files_to_old_folder(file1, file2, file3)
             admins_list[admin] = 'busy'
 

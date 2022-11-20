@@ -1,6 +1,7 @@
 from docxtpl import DocxTemplate, InlineImage
 from Files import work_with_files
 from docx.shared import Mm
+from docx2pdf import convert
 
 
 async def save_word(result_array, file_name):
@@ -20,3 +21,7 @@ async def save_word(result_array, file_name):
                     tpl, image_descriptor=result_element['content'], width=Mm(150))
     tpl.render(render_dict)
     tpl.save(word_path_output)
+
+
+async def save_pdf(file_name):
+    convert(file_name + '.docx', file_name + '.pdf')

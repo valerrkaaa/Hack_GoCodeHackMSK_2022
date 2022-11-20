@@ -1,0 +1,14 @@
+[
+    {
+        "answer_id": 0,
+        "content": "111111",
+        "content_type": "text",
+        "field_name": "{{name_project}}"
+    },
+    {
+        "answer_id": 1,
+        "content": "D:\\Programming\\python\\Programms\\Bots\\Hack_GoCodeHackMSK_2022\\Files\\tempimages\\AgACAgIAAxkBAAIHkWN5hRyHweMFPmjR1H0NQnV7o24jAAIQwzEbvRLJSze8peDHDSSWAQADAgADeQADKwQ.jpg",
+        "content_type": "image",
+        "field_name": "{{teammate1_photo}}"
+    }
+]
